@@ -1,0 +1,7 @@
+---
+- name: "Sync TCP Wrapper (hosts.allow) file to all servers"
+  hosts: all
+  become: yes
+  tasks:
+
+    - import_tasks: /root/tasks/sync-tcp-wrapper-task.yaml

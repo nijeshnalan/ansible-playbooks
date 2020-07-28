@@ -1,0 +1,6 @@
+---
+- name: "Copy custom scripts to all nodes"
+  hosts: all
+  become: yes
+  tasks:
+    - import_tasks: /root/tasks/deploy-scripts-tasks.yaml

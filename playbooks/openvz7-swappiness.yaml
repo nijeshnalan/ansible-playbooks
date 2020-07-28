@@ -1,0 +1,7 @@
+---
+- name: "Change the swappiness value"
+  hosts: all
+  become: yes
+  tasks:
+
+    - import_tasks: /root/tasks/openvz7-swappiness-task.yaml

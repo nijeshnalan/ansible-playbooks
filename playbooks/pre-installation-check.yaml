@@ -1,0 +1,7 @@
+---
+- name: "OpenVZ 7 Server Setup"
+  hosts: all
+  become: yes
+  tasks:
+
+    - import_tasks: /root/tasks/pre-installation-check-task.yaml

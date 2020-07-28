@@ -1,0 +1,12 @@
+- name: "Determining checksum of file"
+  stat:
+    path: /etc/vz/conf/ve-vswap-solus.conf-sample
+    checksum_algorithm: md5
+  register: md5_sum
+
+- name: "Copying configuration file to enable netfilter module"
+  when: md5_sum.stat.checksum != '972066f644b666c47c7881b0b02506b9'
+  copy:
+    src: /root/sync/netfilter/ve-vswap-solus.conf-sample
+    dest: /etc/vz/conf/ve-vswap-solus.conf-sample
+    backup: yes

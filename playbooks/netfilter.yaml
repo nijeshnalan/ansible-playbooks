@@ -1,0 +1,7 @@
+---
+- name: "Make netfilter module automatically enabled"
+  hosts: all
+  become: yes
+  tasks:
+
+    - import_tasks: /root/tasks/netfilter-task.yaml

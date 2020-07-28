@@ -1,0 +1,26 @@
+    - name: "Installation Pre-check! Checking for SolusVM installation..."
+      stat:
+        path: /usr/local/solusvm/www
+      register: solus
+
+    - name: "Installation Pre-check! Checking for cPanel installation..."
+      stat:
+        path: /usr/local/cpanel
+      register: cpanel
+
+    - name: "Installation Pre-check! Checking for Plesk installation..."
+      stat:
+        path: /usr/local/psa
+      register: psa
+
+    - fail:
+        msg: "SolusVM is already installed on this server! Exiting..."
+      when: solus.stat.exists == true
+
+    - fail:
+        msg: "cPanel is already installed on this server! Exiting..."
+      when: cpanel.stat.exists == true
+
+    - fail:
+        msg: "Plesk is already installed on this server! Exiting..."
+      when: psa.stat.exists == true

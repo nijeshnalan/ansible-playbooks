@@ -1,0 +1,24 @@
+    - name: "Creating binary directory and maint script directory"
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - /root/bin
+        - /usr/local/hbh_linux/tmp/maint
+        
+    - name: "Copying all scripts to /root/bin directory"
+      copy:
+        src: /root/sync/repos/python-scripts/
+        dest: /root/bin/
+        mode: preserve
+    
+    - name: "Installing Dependancy packages"
+      yum:
+        name: prl-disk-tool
+        state: latest
+
+    - name: "Restart atd service for maint script"
+      service:
+        name: atd
+        state: restarted
+        enabled: yes

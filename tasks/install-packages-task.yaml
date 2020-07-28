@@ -1,0 +1,19 @@
+    - name: "Installing Necessary Packages"
+      yum:
+        name: 
+          - tcpdump
+          - atop
+          - sysstat
+          - ngrep
+          - iotop
+          - iftop
+          - vnstat
+          - strace
+          - ncdu
+        state: present
+
+    - name: "Restarting serivce"
+      service:
+        name: atop
+        state: restarted
+        enabled: yes

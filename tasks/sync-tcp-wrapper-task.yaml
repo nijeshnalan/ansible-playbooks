@@ -1,0 +1,6 @@
+    - name: "Copying TCP Wrapper file"
+      copy:
+        src: /root/sync/tcpwrpper/hosts.allow
+        dest: /etc/
+        mode: preserve
+        backup: yes

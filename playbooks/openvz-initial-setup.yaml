@@ -1,0 +1,82 @@
+---
+- name: "OpenVZ 7 Server Setup"
+  hosts: all
+  become: yes
+  tasks:
+
+    - import_tasks: /root/tasks/pre-installation-check-task.yaml
+
+    - name: "Doing the conversion - Installing Packages"
+      yum:
+        name:
+          - https://download.openvz.org/virtuozzo/releases/openvz-7.0.11-235/x86_64/os/Packages/p/python-subprocess32-3.2.7-1.vz7.5.x86_64.rpm
+          - https://download.openvz.org/virtuozzo/releases/openvz-7.0.11-235/x86_64/os/Packages/o/openvz-release-7.0.11-3.vz7.x86_64.rpm
+          - epel-release
+          - python3
+          - http://repo.virtuozzo.com/vzlinux/7/x86_64/os/Packages/r/readykernel-scan-0.11-1.vl7.noarch.rpm
+          - http://repo.virtuozzo.com/vzlinux/7/x86_64/os/Packages/z/zstd-1.4.4-1.vl7.x86_64.rpm
+          - http://repo.virtuozzo.com/vzlinux/7/x86_64/os/Packages/v/vzlinux-release-7-1.vl7.89.x86_64.rpm
+        state: present
+
+    - name: "Removing Repos to avoid package conflict"
+      raw: mv /etc/yum.repos.d/CentOS-* /root/
+      ignore_errors: yes
+
+    - name: 'Removing json-c'
+      shell: "rpm -e --nodeps --justdb json-c"
+
+    - name: "Removing jansson"
+      yum:
+        name: jansson
+        state: absent
+
+    - name: "Re-installing json-c and jansson packages from virtuozzo repo"
+      yum:
+        name:
+          - http://repo.virtuozzo.com/vzlinux/7.7/x86_64/os/Packages/j/jansson-2.10-1.vl7.1.x86_64.rpm
+          - http://repo.virtuozzo.com/vzlinux/7.7/x86_64/os/Packages/j/json-c-0.11-13.vl7.1.x86_64.rpm
+          - prlctl
+          - prl-disp-service
+          - vzkernel
+          - "*ploop*"
+        state: present
+
+    - name: "Upgrading all packages Node"
+      yum:
+        name: '*'
+        state: latest
+        update_cache: yes
+
+    - name: "Generating the grub.cfg file"
+      shell: "{{ item }}"
+      with_items: 
+        - grub2-set-default 1
+        - grub2-mkconfig -o /boot/efi/EFI/virtuozzo/grub.cfg
+
+    - name: "Rebooting the server"
+      reboot:
+        reboot_timeout: 3600
+
+    - name: "Enabling Kernel Modules"
+      modprobe:
+        name: "{{ item }}"
+        state: present
+      with_items:
+          - ploop
+          - pfmt_ploop1
+          - pfmt_raw
+          - pio_direct
+          - ppp_deflate
+          - ppp_async
+
+    - name: "Running SolusVM installation script"
+      script: /root/sync/OpenVZ-Setup/install.sh
+      args:
+        chdir: /tmp
+
+    - import_tasks: /root/tasks/deploy-scripts-tasks.yaml
+    - import_tasks: /root/tasks/sync-tcp-wrapper-task.yaml
+    - import_tasks: /root/tasks/install-packages-task.yaml
+    - import_tasks: /root/tasks/netfilter-task.yaml
+    - import_tasks: /root/tasks/openvz7-swappiness-task.yaml
+    - import_tasks: /root/tasks/ez-template-task.yaml

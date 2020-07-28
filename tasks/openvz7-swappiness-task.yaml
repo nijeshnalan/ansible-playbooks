@@ -1,0 +1,16 @@
+- name: "Determining checksum of sysctl file"
+  stat:
+    path: /etc/sysctl.conf
+    checksum_algorithm: md5
+  register: md5_sum
+
+- name: "Copying configuration file to set swappiness value"
+  when: md5_sum.stat.checksum != '195529eed5d48d59f8deb676ee8307a0'
+  copy:
+    src: /root/sync/swappiness/sysctl.conf
+    dest: /etc/sysctl.conf
+    backup: yes
+
+- name: "Change the swappiness value without rebooting"
+  when: md5_sum.stat.checksum != '195529eed5d48d59f8deb676ee8307a0'
+  shell: "sysctl -w vm.swappiness=10"

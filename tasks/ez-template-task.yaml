@@ -1,0 +1,15 @@
+- name: "Installing All EZ Templates"
+  yum:
+    name:
+      - ubuntu-20.04-x86_64-ez
+      - suse-42.2-x86_64-ez
+      - suse-42.3-x86_64-ez
+      - centos-8-x86_64-ez
+      - debian-10.0-x86_64-ez
+    state: present
+
+- name: "Copying Templates to cache directory"
+  copy:
+    src: /root/sync/templates/
+    dest: /vz/template/cache/
+    mode: preserve

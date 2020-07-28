@@ -1,0 +1,9 @@
+---
+- name: "Install EZ Templates"
+  hosts: openvz7
+  gather_facts: no
+  become: yes
+  tasks:
+
+    - import_tasks: /root/tasks/ez-template-task.yaml
+
