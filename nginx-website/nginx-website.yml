@@ -1,0 +1,50 @@
+---
+- name: "Install nginx and host a website"
+  hosts: ubuntu
+  become: yes
+  
+  vars_files:
+    - nignx.vars
+    
+  tasks:
+
+    - name: "Install nginx"
+      apt:
+        update_cache: yes
+        name: nginx
+        state: latest
+
+    - name: "Creating necessary directories"
+      file:
+        path: "{{ item }}"
+        owner: root
+        group: root
+        mode: 755
+        state: directory
+      with_items:
+        - "/var/www/ubuntu"
+        - "/var/www/ubuntu/{{ site_name }}"
+
+    - name: "Copying website"
+      copy:
+        src: ./website/
+        dest: /var/www/ubuntu/{{ site_name }}/
+
+    - name: "Copying website config file"
+      template:
+        src: ./website_conf.j2
+        dest: /etc/nginx/sites-available/{{ site_name }}
+
+    - name: "Creating a symbolic link"
+      file:
+        src: /etc/nginx/sites-available/{{ site_name }}
+        dest: /etc/nginx/sites-enabled/{{ site_name }}
+        owner: root
+        group: root
+        state: link
+
+    - name: "Restarting and Enabling nginx service"
+      service:
+        name: nginx
+        state: restarted
+        enabled: yes
